@@ -8,12 +8,13 @@ import glob
 from natsort import natsorted
 from tqdm import tqdm
 import matplotlib.pyplot as plt
+import Blob_Detector as blob
 
 #%%
 input_path="C:\\Users\\festi\\Documents\\ISP\\MoleDetector-master\\dlib_test/*"
 output_path="C:\\Users\\festi\\Documents\\ISP\\MoleDetector-master\\dlib_test/"
 predictor_path = 'C:\\Users\\festi\\Downloads\\shape_predictor_68_face_landmarks.dat'
-INDEX=11
+INDEX=12
 
 images=natsorted(glob.glob(input_path))
 print("Current Image")
@@ -26,7 +27,11 @@ img[:, :, :] = image[:, :, :]
 im = np.zeros((image.shape[0], image.shape[1], 3), np.uint8)
 im[:, :, :] = 0 ## stores image after blur
 im = cv2.GaussianBlur(img, (3, 3), 1) # original (5,5)
-params = cv2.SimpleBlobDetector_Params()
+params = blob.init_params()
+print('Show Params')
+for attr in dir(params):
+    if not attr.startswith("_"):
+        print(attr, "=", getattr(params, attr))
 
 #%%
 detector_dlib = dlib.get_frontal_face_detector()
@@ -42,36 +47,11 @@ for rect in rects:  # Directly iterate over rects
 print(len(land_marks))
 
 #%%
-params.minThreshold = 0
-params.thresholdStep = 5
-params.maxThreshold = 255
-
-# Filter by Area.
-params.filterByArea = True
-params.minArea = 3  # original 20
-# params.maxArea = 550
-
-# Filter by Circularity
-params.filterByCircularity = True
-params.minCircularity = 0.4  #
-
-# Filter by Convexity
-params.filterByConvexity = True
-params.minConvexity = 0.87
-
-# Filter by Inertia
-params.filterByInertia = True
-params.minInertiaRatio = 0.2
-
-# Filter by Color
-params.filterByColor = True
-params.blobColor = 0
-
-#%%
 img_circle = np.zeros((img.shape[0], img.shape[1], 1), np.uint8)
 img_circle[:, :, :] = 0  # 设置为全透明
 
 #%%
+keypoints = detector.detect(im)
 for i in range(len(land_marks)):
     land_mark = land_marks[i]
 
@@ -195,7 +175,7 @@ for i in range(len(land_marks)):
     else:
         detector = cv2.SimpleBlobDetector_create(params)
 
-    keypoints = detector.detect(im)
+    # keypoints = detector.detect(im)
     for i in range(len(keypoints)):
         #TODO
         x, y = int(keypoints[i].pt[0]), int(keypoints[i].pt[1])  # keypoints的中心坐标
@@ -207,7 +187,8 @@ for i in range(len(land_marks)):
                         and y <=remove['right_eye_maxy']
         is_moth = x >= remove['mouth_minx'] and x <= remove['mouth_maxx'] and y >= remove['mouth_miny'] \
                     and y <= remove['mouth_maxy']
-        if is_face and not(is_nose) and not(is_left_eye) and not(is_rigth_eye) and not(is_moth):
+        # if is_face and not(is_nose) and not(is_left_eye) and not(is_rigth_eye) and not(is_moth):
+        if not(is_nose) and not(is_left_eye) and not(is_rigth_eye) and not(is_moth):
             img_circle = cv2.circle(img_circle, (x, y), math.ceil(keypoints[i].size), 255, -1)
 
 #%%
@@ -220,7 +201,8 @@ if mask_binary.ndim == 3:
     mask_binary = mask_binary[:, :, 0]  # Flatten last dimension
 output_image = image * mask_binary[:, :, np.newaxis]
 
-plt.imshow(output_image)
+plt.imshow(img)
 plt.title("Original Image with Mask Applied")
 plt.show()
+
 # %%

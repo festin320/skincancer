@@ -146,7 +146,8 @@ def blob(image):
                            and y <=remove['right_eye_maxy']
             is_moth = x >= remove['mouth_minx'] and x <= remove['mouth_maxx'] and y >= remove['mouth_miny'] \
                       and y <= remove['mouth_maxy']
-            if is_face and not(is_nose) and not(is_left_eye) and not(is_rigth_eye) and not(is_moth):
+            # if is_face and not(is_nose) and not(is_left_eye) and not(is_rigth_eye) and not(is_moth):
+            if not(is_nose) and not(is_left_eye) and not(is_rigth_eye) and not(is_moth):
                 img_circle = cv2.circle(img_circle, (x, y), math.ceil(keypoints[i].size), 255, -1)
     img[:,:,0][img_circle[:,:,0]==0] = 0
     img[:,:,1][img_circle[:,:,0]==0] = 0

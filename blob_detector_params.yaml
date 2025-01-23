@@ -1,0 +1,28 @@
+blobColor: 0 # dark blob
+
+collectContours: false
+
+filterByArea: true
+minArea: 1
+maxArea: 10000
+minDistBetweenBlobs: 1
+
+filterByCircularity: true
+minCircularity: 0.4
+# maxCircularity: 100000
+
+filterByColor: true
+minThreshold: 50.0
+maxThreshold: 220.0
+thresholdStep: 10.0
+
+filterByConvexity: true
+minConvexity: 0.1
+# maxConvexity: 1000000
+
+filterByInertia: true
+minInertiaRatio: 0.2
+# maxInertiaRatio: 100000
+
+minRepeatability: 2
+
